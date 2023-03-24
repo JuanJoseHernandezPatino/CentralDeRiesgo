@@ -1,0 +1,856 @@
+{{!-- tarjeta izquierda --}}
+<link href="assets/libs/dropzone/min/dropzone.min.css" rel="stylesheet" type="text/css" />
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-body table-responsive" style="min-height:350px; max-height:351px">
+                    <div class="card-header" id="grafico1">
+                        <h4 class="card-title mb-0">Gestiones realizadas en los ultimos 10 días</h4>
+                        {{!-- <div id="chart"></div> --}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-body table-responsive" style="min-height:350px; max-height:351">
+
+                    <form id="corte">
+                        <div class="m-3">
+                            <label class="form-label">Cohorte</label>
+                            <select class="form-select" id="ddlcohortes" name="cohortes" onchange="selecioncohorte()">
+                            </select>
+
+                        </div>
+
+                    </form>
+                    <div id="grafic">
+                        <div class="mt-3 pt-1">
+                            <div class="d-flex justify-content-between">
+                                <p class="text-muted font-size-13 mb-1">Grafico total: </p>
+                                <p class="text-muted font-size-13 mb-1 text-truncate" id="valorTotal"></p>
+                            </div>
+                            <div class="progress animated-progess mb-4" id="lineaTotal">
+                            </div>
+                            <div style="display: none; flex-direction: row; justify-content: flex-start;" id="numTotal">
+                            </div>
+                        </div>
+                        <div id="grafico2">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    {{!-- tarjeta derecha --}}
+
+
+
+    <div class="col-md-6">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-body">
+                    <ul class="nav nav-pills nav-justified">
+                        <li class="nav-item waves-effect waves-light">
+
+                            <button id="gestionb" style="width:100%; height:100%" type="submit"
+                                class="btn btn-success">Gestión</button>
+
+                        </li>
+
+                        <li class="nav-item waves-effect waves-light" style="padding-left: 5px;">
+
+                            <button id="btnAfiliados" style="width:100%; height:100%"
+                                onclick="MostrarAfiliados(); dibujarTabla();" type="submit"
+                                class="btn btn-primary">Afiliados</button>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-12" id="gestion">
+                <div class="card card-body" style="min-height:600px">
+                    <h4> Usuarios para Gestión (<label id="cntGestion">0</label>)</h4>
+
+                    <div class="hstack gap-3">
+                        <input class="form-control me-auto" type="text" name="txtIdentificacionG"
+                            id="txtIdentificacionG" required="true"
+                            placeholder="Ingrese nombre o identificación o eps del usuario">
+                        <button id="btn_gestion" type="submit" class="btn btn-primary">Buscar</button>
+                    </div>
+
+                    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+
+                    <div class="col-md-12" id="tblafil1">
+                        <div class="card-body cohorte-div card card-body border border-dar" style="margin-top: 10px;">
+                            <div class="table-responsive" style="max-height: 200px;">
+                                {{!-- esta es la tabla de todos los de gestion --}}
+                                <table class="table table-bordered mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Identificación</th>
+                                            <th>Nombre</th>
+                                            <th>EPS</th>
+                                            <th>Acción</th>
+
+
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbl-gestion">
+
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="card card-body">
+                            <div class="row" style="text-align:center">
+                                <div class="col-md-12">
+                                    <form id="frmGestion">
+                                        <div class="mb-3">
+                                            <div class="input-group">
+
+                                                <input class="form-control" type="file" id="fileG" name="file"
+                                                    accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+
+                                                <button style="display: none;" id="btnGestion"></button>
+                                            </div>
+                                        </div>
+                                    </form>
+
+                                    <div style="text-align: right; margin-top:10px">
+                                        <button onclick="cargarg()" type=" submit" class="btn btn-outline-info">
+                                            <span class="mdi mdi-cloud-upload"></span> Procesar Archivo</button>
+                                        <button type="submit" class="btn btn-outline-warning"
+                                            style="margin-left:10xp"><span style=" font-size:14px"
+                                                class="mdi mdi-close-circle-outline"
+                                                onclick="cancelarg()">Cancelar</button>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
+
+            <div class="col-md-12" id="afiliados" style="display:none; ">
+                <div class="card card-body" style="min-height:600px">
+                    <h4> Población PROSALCO(<label id="cntAfiliados">0</label>)</h4>
+
+                    <div class="hstack gap-3">
+                        <input class="form-control me-auto" type="text" id="idAfiliados" required="true"
+                            placeholder="Ingrese identificación del usuario">
+                        <button type="submit" class="btn btn-primary" id="btn_afiliados">Buscar</button>
+                    </div>
+
+                    <div class="col-md-12" id="tblafil1">
+                        <div class="card" style="margin-top: 10px;">
+                            <div class="card-body cohorte-div card card-body border border-dark">
+                                <div class="table-responsive" style="max-height: 200px;">
+                                    <table class="table table-bordered mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Identificación</th>
+                                                <th>Eps</th>
+                                                <th>Estado</th>
+                                                <th>Fecha</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbl-afiliados">
+
+                                        </tbody>
+                                    </table>
+
+
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="col-md-12" style="text-align:right; margin-top:-35px">
+                                    <button class="btn btn-outline-success" id="DecargarExcel"><i
+                                            class="mdi mdi-microsoft-excel"></i> Descargar Excel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="card card-body">
+                            <div class="row" style="text-align:center">
+                                <div class="col-md-12">
+                                    <form id="frmAfiliados">
+                                        <div class="mb-3">
+                                            <div class="input-group">
+
+                                                <input class="form-control" type="file" id="file" name="file"
+                                                    accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+                                                <button style="display: none;" id="btnAfiliado"></button>
+                                            </div>
+                                        </div>
+                                    </form>
+
+                                    <div style="text-align: right; margin-top:10px">
+                                        <button onclick="cargarA()" type="submit" class="btn btn-outline-info">
+                                            <span class="mdi mdi-cloud-upload"></span> Procesar Archivo</button>
+                                        <button onclick="cancelarA()" type="submit" class="btn btn-outline-warning"
+                                            style="margin-left:10xp"><span style=" font-size:14px"
+                                                class="mdi mdi-close-circle-outline">Cancelar</button>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+
+
+
+
+        <script>
+
+
+
+            let gestionb = document.querySelector("#gestionb");
+            gestionb.addEventListener("click", function () {
+
+                const gestion = document.querySelector("#gestion");
+                const afiliados = document.querySelector("#afiliados");
+                afiliados.style.display = "none";
+                gestion.style.display = "block";
+            });
+
+            function MostrarAfiliados() {
+
+                const gestion = document.querySelector("#gestion");
+                const afiliados = document.querySelector("#afiliados");
+                afiliados.style.display = "block";
+                gestion.style.display = "none";
+            }
+
+
+        </script>
+
+        {{!--aqui se va a cargar las tablas de la pagina principal --}}
+        <script>
+            var DatosTabla = {};
+            //cuando recarga la pagina ejecuta este bloque
+            document.addEventListener("DOMContentLoaded", function () {
+                precargar();
+            });
+            function precargar() {
+
+                axios.get('/gestiondatos')
+                    .then(function (response) {
+                        //  console.log(response)
+                        crearTablaGestion(response)
+
+                    })
+                    .catch(function (error) {
+                        //console.log(error);
+                        alert("- Error al precargar, por favor contacte al administrador.");
+                    });
+            }
+
+
+            //cuando se sube un archivo excel se ejecuta esto
+
+            function cargarg() {
+                document.querySelector("#btnGestion").click();
+            }
+            function cancelarg() {
+                document.querySelector("#fileG").value = "";
+
+            }
+            function cargarA() {
+                document.querySelector("#btnAfiliado").click();
+            }
+            function cancelarA() {
+                document.querySelector("#file").value = "";
+
+            }
+
+            //gestion 
+            const form = document.querySelector('#frmGestion');
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+
+                const formData = new FormData(form);
+
+                axios.post('/ArchivoG', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }).then((response) => {
+                    //console.log(response.data);
+                    if (response.data[0] == "x") {
+                        alert("- El archivo esta vacío o no contiene las columnas \n eps, identificacionUsu, nombre.\n deben estar escritas como se enuncian")
+                        precargar();
+                        document.querySelector("#fileG").value = "";
+
+                    }
+                    else {
+                        if (response.data[0] == "y") {
+                            alert("- el archivo no contiene los campos requeridos");
+                            precargar();
+                            document.querySelector("#fileG").value = "";
+
+                        }
+                        else {
+                            if (response.data[0] == "no valido") {
+                                alert("- el archivo no es valido");
+                                precargar();
+                                document.querySelector("#fileG").value = "";
+                            }
+                            else {
+                                if (response.data[0] == "sin archivo") {
+                                    alert("- no subió ningun archivo");
+                                    precargar();
+                                    document.querySelector("#fileG").value = "";
+                                }
+                                else {
+                                    alert("- Archivo cargado correctamente");
+                                    precargar();
+                                    document.querySelector("#fileG").value = "";
+                                }
+                            }
+                        }
+                    }
+
+                }).catch((error) => {
+                    alert("- No se pudo cargar el archivo.")
+                    document.querySelector("#fileG").value = "";
+
+                });
+            });
+
+            function Cancelar() {
+                document.querySelector("fileG").value = "";
+                document.querySelector("file").value = "";
+            }
+
+            //cuando se le da al boton para cargar la gestion del usuario
+            function GestionarUsuario(id) {
+                var id = id.toString();
+                axios.post('/cambio', {
+                    id: id
+                })
+                    .then(function () {
+                        window.location.replace("/gestionCohorte");
+                    });
+                window.location.replace("/gestionCohorte");
+            };
+
+            //para buscar un solo usuario de gestion
+            document.getElementById('btn_gestion').addEventListener("click", function () {
+
+                let txtIdentificacionG = document.getElementById('txtIdentificacionG').value;
+
+                axios.get(`/procesos/gestionCohortex?txtIdentificacionG=${txtIdentificacionG}`)
+                    .then(function (response) {
+                        crearTablaGestion(response);
+                    })
+                    .catch(function (error) {
+                        precargar();
+                        alert("No se encontraron registros");
+                    });
+
+            });
+
+            //dibuja la tabla
+            function crearTablaGestion(response) {
+
+                const tblbody = document.querySelector("#tbl-gestion");
+                tblbody.innerHTML = ""; //limpiar tabla 
+
+                var lblGest = document.getElementById('cntGestion')
+                lblGest.innerHTML = response.data.length;
+
+                response.data.forEach(function (data) {
+                    const row = document.createElement("tr");
+                    const identificacion = document.createElement("td");//identificacion 
+                    identificacion.innerHTML = data.identificacionUsu;
+
+                    const eps = document.createElement("td"); //eps
+                    eps.innerHTML = data.eps;
+
+                    const nombre = document.createElement("td"); //nombre 
+                    nombre.innerHTML = data.nombre;
+
+                    const Boton = document.createElement("td"); //nombre 
+                    const b = document.createElement("button");
+                    b.id = 'accion'
+                    b.value = "Gestión";
+                    b.innerHTML = "Gestión";
+                    b.className = "btn btn-success";
+                    //b.setAttribute('data-identificacion', data.identificacionUsu);
+                    b.setAttribute('onclick', "GestionarUsuario(" + data.identificacionUsu + ")");
+
+                    Boton.appendChild(b);
+
+                    row.appendChild(identificacion);
+                    row.appendChild(nombre);
+                    row.appendChild(eps);
+                    row.appendChild(Boton);
+                    tblbody.appendChild(row);
+
+                })
+            }
+
+
+
+            //__________________________________________________________________________________________________________________________________________________________
+            //configuracion tabla afiliados
+
+
+            //para buscar un solo usuario de afiliados
+            document.getElementById('btn_afiliados').addEventListener("click", function () {
+
+                let txtIdentificacionA = document.getElementById('idAfiliados').value;
+
+                axios.get(`/afiliados?idAfiliados=${txtIdentificacionA}`)
+                    .then(function (response) {
+
+                        crearTablaAfiliados(response);
+
+                    })
+                    .catch(function (error) {
+                        console.log(error)
+
+                        alert("No se encontraron registros");
+                    });
+
+            });
+
+            //cuando le de al boton afiliados
+            function dibujarTabla() {
+
+                let txtIdentificacionG = document.getElementById('txtIdentificacionG').value;
+
+                axios.get(`/procesos/gestionCohorte`)
+                    .then(function (response) {
+                        crearTablaAfiliados(response);
+                    })
+                    .catch(function (error) {
+                        alert("- Error al precargar, por favor contacte al administrador.");
+                    });
+
+            };
+
+
+
+            //afiliados 
+            const form2 = document.querySelector('#frmAfiliados');
+            form2.addEventListener('submit', (event) => {
+                event.preventDefault();
+
+                const formData = new FormData(form2);
+
+                axios.post('/cargarArchivo', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }).then((response) => {
+                    //console.log(response.data);
+                    if (response.data[0] == "x") {
+                        alert("- El archivo esta vacío o no contiene las columnas \n Identificacion, Eps, Estado, Fecha.\n deben estar escritas como se enuncian")
+                        tablaAfiliados()
+                        document.querySelector("#file ").value = "";
+
+                    }
+                    else {
+                        if (response.data[0] == "y") {
+                            alert("- el archivo no contiene los campos requeridos");
+                            tablaAfiliados()
+                            document.querySelector("#file ").value = "";
+                        }
+                        else {
+                            if (response.data[0] == "no valido") {
+                                alert("- el archivo no es valido");
+                                tablaAfiliados()
+                                document.querySelector("#file ").value = "";
+                            }
+                            else {
+                                if (response.data[0] == "sin archivo") {
+                                    alert("- no subió ningun archivo");
+                                    tablaAfiliados()
+                                    document.querySelector("#file ").value = "";
+                                }
+                                else {
+                                    alert("- Archivo cargado correctamente");
+                                    tablaAfiliados()
+                                    document.querySelector("#file ").value = "";
+                                }
+                            }
+
+
+                        }
+
+                    }
+
+                }).catch((error) => {
+                    alert("- No se pudo cargar el archivo.")
+                    document.querySelector("#file ").value = "";
+
+                });
+            });
+
+            function tablaAfiliados() {
+                let response = [];
+                axios.get('/tablaCompletaAfiliados')
+                    .then(function (response) {
+                        //  console.log(response
+                        crearTablaAfiliados(response)
+
+                    })
+                    .catch(function (error) {
+                        //console.log(error);
+                        alert("- Error al precargar, por favor contacte al administrador.");
+                    });
+                console.log(response);
+            }
+            //dibuja la tabla
+            function crearTablaAfiliados(response) {
+
+                var tblbody = document.querySelector("#tbl-afiliados");
+                tblbody.innerHTML = ""; //limpiar tabla 
+
+                var lblGest = document.getElementById('cntAfiliados')
+                lblGest.innerHTML = response.data.length;
+
+                DatosTabla = {};
+                DatosTabla = response.data;
+
+                response.data.forEach(function (data) {
+                    var row = document.createElement("tr");
+                    var identificacion = document.createElement("td");//identificacion 
+                    identificacion.innerHTML = data.Identificacion;
+
+                    var eps = document.createElement("td"); //eps
+                    eps.innerHTML = data.Eps;
+
+                    var Estado = document.createElement("td"); //nombre 
+                    Estado.innerHTML = data.Estado;
+
+                    var Fecha = document.createElement("td"); //
+                    Fecha.innerHTML = data.Fecha;
+
+
+                    row.appendChild(identificacion);
+                    row.appendChild(eps);
+                    row.appendChild(Estado);
+                    row.appendChild(Fecha);
+                    tblbody.appendChild(row);
+                })
+            }
+
+
+
+            function descargarExcel() {
+
+                const worksheet = XLSX.utils.json_to_sheet(DatosTabla);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, 'Datos');
+
+                XLSX.writeFile(workbook, 'datos.xlsx');
+            }
+
+            document.getElementById('DecargarExcel').addEventListener('click', descargarExcel);
+
+
+        </script>
+        {{!-- para el grafico numero 1 --}}
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts@latest"></script>
+
+        <script>
+
+
+            window.addEventListener('load', function () {
+                precargar2();
+
+                var fechaGI = new Date('01/01/2022');
+                var fechaGf = new Date(fechaGI);
+                fechaGf.setDate(fechaGI.getDate() - 10);
+
+                let FI = cambioFecha(fechaGI);
+                let FF = cambioFecha(fechaGf);
+                axios.post('/grafico1', {
+                    FI: FI,
+                    FF: FF
+                })
+                    .then(function (response) {
+                        const processedData = response.data.resultados;
+                        let fechas = [];
+                        let cantidades = [];
+                        processedData.forEach(
+                            (data) => {
+                                let ft = data._id
+                                ft = ft.substring(0, 10);
+                                ft = ft.split('-')
+                                ft = ft[2] + '\n' + ft[1] + '-' + ft[0];
+                                fechas.push(ft)
+                                cantidades.push(data.count)
+                            }
+                        )
+
+                        var options = {
+                            chart: {
+                                type: 'bar'
+                            },
+                            plotOptions: {
+                                bar: {
+                                    horizontal: true
+                                }
+                            },
+                            series: [{
+                                name: 'Numero de gestiones',
+                                data: cantidades
+                            }],
+                            xaxis: {
+                                categories: fechas
+                            }
+                        }
+
+                        var chart = new ApexCharts(document.querySelector("#grafico1"), options);
+                        chart.render();
+
+                    })
+                    .catch(function (error) {
+                        console.log(error)
+                    });
+            });
+
+
+            function cambioFecha(x) {
+                let fecha = x
+                let dia = fecha.getDate().toString().padStart(2, "0");
+                let mes = (fecha.getMonth() + 1).toString().padStart(2, "0");
+                let anio = fecha.getFullYear().toString();
+                let fecha_formateada = `${anio}-${mes}-${dia}`;
+                return fecha_formateada;
+            }
+
+
+            function selecioncohorte() {
+
+                let cohorte = document.getElementById('ddlcohortes').value;
+                document.getElementById("numTotal").style.display = "none";
+
+
+                axios.post('/listadocohortes', {
+                    cohorte: cohorte
+                })
+                    .then(function (response) {
+                        //construir el grafico con los resultados de la consulta
+                        if (cohorte == "") {
+                            precargar2()
+                        }
+                        else {
+                            graficoSelect(response);
+                        }
+
+                    })
+                    .catch(function (error) {
+                        console.log(error)
+                    });
+
+
+            }
+
+
+            function graficoSelect(response) {
+                const processedData = response.data.resultados;
+                let datos = [];
+                let sumCount = 0; // variable para acumular la suma de los valores count
+                let i = 0;
+                document.querySelector("#grafico2").innerHTML = "";
+
+                processedData.forEach(
+                    (data) => {
+                        let _id = data._id
+                        _id = _id.substring(0, 10);
+                        _id = _id.split('-')
+                        _id = _id[2] + '\n' + _id[1] + '-' + _id[0];
+                        let count = data.count;
+                        sumCount += processedData[i].count;
+                        i++;
+                        datos.push({ _id, count })
+                    }
+                )
+                grafico(sumCount, datos)
+            }
+
+
+            function graficoC(response) {
+                const processedData = response.data.resultados;
+                let titulo = "Total cohortes";
+                let sumCount = 0; // variable para acumular la suma de los valores count
+                for (let i = 0; i < processedData.length; i++) {
+                    sumCount += processedData[i].count;
+                }
+                grafico(sumCount, processedData, titulo);
+            }
+
+            // cargar las cohortes a la pagina 
+            document.addEventListener("DOMContentLoaded", cargar);
+
+            function cargar() {
+                let cohorte = document.getElementById('ddlcohortes');
+                const opcion1 = document.createElement('option');
+                opcion1.value = "";
+                opcion1.textContent = "selecciona una opción";
+                cohorte.appendChild(opcion1)
+                axios.post('/listacohortes')
+                    .then(function (response) {
+                        response.data.listacohortes.forEach(function (data) {
+                            const opcion1 = document.createElement('option');
+                            opcion1.value = data.codigo;
+                            opcion1.textContent = data.Nombre;
+                            cohorte.appendChild(opcion1)
+
+                        })
+
+                    })
+                    .catch(function (error) {
+                        alert(error)
+
+                    });
+            }
+
+            function precargar2() {
+                axios.get('/graficoCohortes')
+                    .then(function (response) {
+                        graficoC(response);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        alert("- Error al precargar, por favor contacte al administrador.");
+                    });
+            }
+
+            function grafico(total, arreglo, titulo) {
+                let grafico2 = document.querySelector("#grafico2");
+                let valorTotal = document.querySelector("#valorTotal");
+                let lineaTotal = document.querySelector("#lineaTotal");
+                let numTotal = document.querySelector("#numTotal");
+
+                valorTotal.innerHTML = "";
+                valorTotal.textContent = total;
+                grafico2.innerHTML = "";
+                lineaTotal.innerHTML = "";
+                numTotal.innerHTML = "";
+                let i = 0;
+
+                arreglo.forEach(arreglo => {
+                    //______________se crean los elementos
+                    i++
+                    var divPadre = document.createElement("div");
+                    var divTitulo = document.createElement("div");
+                    var pTitulo = document.createElement("p");
+                    var tituloTotal = document.createElement("p");
+                    var pCount = document.createElement("p");
+                    var contenedor = document.createElement("div");
+                    var barra = document.createElement("div");
+                    var barra2 = document.createElement("div");
+                    var barraN = document.createElement("div");
+                    var num = document.createElement("p")
+
+                    //<div class="progress-bar" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+
+                    //_______________ se agregan sus respectivas clases y atributos
+                    divPadre.classList = "mt-3 pt-1";
+                    divTitulo.classList = "d-flex justify-content-between";
+                    pTitulo.classList = "text-muted font-size-13 mb-1";
+                    tituloTotal.classList = "text-muted font-size-13 mb-1";
+                    pCount.classList = "text-muted font-size-13 mb-1 text-truncate";
+                    num.classList = "text-muted font-size-13 mb-1 text-truncate";
+
+                    contenedor.classList = "progress animated-progess custom-progress";
+
+                    barra.classList = "progress-bar bg-gradient bg-success";
+                    barra2.classList = "progress-bar";
+                    const num1 = Math.floor(Math.random() * 256);
+                    const num2 = Math.floor(Math.random() * 256);
+                    const num3 = Math.floor(Math.random() * 256);
+
+                    var color = "rgba(" + num1 + "," + num2 + "," + num3 + ")";
+                    barra2.style.backgroundColor = color;
+
+                    barra.role = "progressbar";
+                    barra.setAttribute('aria-valuenow', "25");
+                    barra.setAttribute('aria-valuemin', "0");
+                    barra.setAttribute('aria-valuemax', "100");
+
+                    barra2.role = "progressbar";
+                    barra2.setAttribute('aria-valuenow', "70");
+                    barra2.setAttribute('aria-valuemin', "0");
+                    barra2.setAttribute('aria-valuemax', "70");
+
+                    barraN.classList = "";
+                    barraN.role = "progressbar";
+                    barraN.setAttribute('aria-valuenow', "70");
+                    barraN.setAttribute('aria-valuemin', "0");
+                    barraN.setAttribute('aria-valuemax', "70");
+                    //_________________se agregan los atributos segun su porcentaje y otros contenidos
+                    let sum = (arreglo.count * 100) / total;
+                    let resultado = sum + "%";
+                    barra.style.width = resultado;
+                    barra2.style.width = resultado;
+                    barra2.style.color = "red";
+                    barraN.style.width = resultado;
+
+                    var por = resultado.split(".");
+                    por = por[0] + "." + por[1].slice(0, 1) + "%";
+                    num.textContent = i;
+                    /*                              nombre de cada cohorte                                  */
+                    pCount.textContent = arreglo.count + "(" + por + ")";
+                    pTitulo.textContent = i + ") " + arreglo._id;
+                    tituloTotal.textContent = titulo;
+                    //_________________se unen los elementos entre si y se insertan en el documento principal
+
+
+                    barraN.appendChild(num);
+                    numTotal.appendChild(barraN);
+                    divTitulo.appendChild(pTitulo);
+                    divTitulo.appendChild(pCount);
+
+                    contenedor.appendChild(barra);
+                    lineaTotal.appendChild(barra2);
+                    divPadre.appendChild(divTitulo);
+                    divPadre.appendChild(contenedor);
+                    grafico2.appendChild(divPadre)
+
+                    setTimeout(function () {
+                        document.getElementById("numTotal").style.display = "flex";
+                    }, 2000);
+                });
+
+            }
+
+
+
+        </script>
